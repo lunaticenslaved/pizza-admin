@@ -1,15 +1,11 @@
 'use server';
 
 import { db } from '@/shared/db';
+import { ServerResponse } from '@/shared/types';
 
 import { CreateTagValues } from './types';
 
-interface CreateTagResponse {
-  type: 'success' | 'error';
-  message: string;
-}
-
-export async function createTag({ name }: CreateTagValues): Promise<CreateTagResponse> {
+export async function createTag({ name }: CreateTagValues): Promise<ServerResponse> {
   return db?.$transaction(async trx => {
     const existingTag = await trx.pizzaTag.findUnique({
       where: { title: name },
@@ -33,10 +29,7 @@ export async function createTag({ name }: CreateTagValues): Promise<CreateTagRes
   });
 }
 
-export async function editTag(
-  tagId: string,
-  { name }: CreateTagValues,
-): Promise<CreateTagResponse> {
+export async function editTag(tagId: string, { name }: CreateTagValues): Promise<ServerResponse> {
   return db?.$transaction(async trx => {
     const existingTag = await trx.pizzaTag.findUnique({
       where: { id: tagId },
@@ -61,7 +54,7 @@ export async function editTag(
   });
 }
 
-export async function deleteTag(tagId: string): Promise<CreateTagResponse> {
+export async function deleteTag(tagId: string): Promise<ServerResponse> {
   return db?.$transaction(async trx => {
     const existingTag = await trx.pizzaTag.findUnique({
       where: { id: tagId },

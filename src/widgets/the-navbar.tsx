@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 
 import { LogoutButton } from '@/features/auth/ui';
 import { cn } from '@/shared/lib';
+import { ClassNameProp } from '@/shared/types';
 
 const routes = [
   {
@@ -17,11 +18,11 @@ const routes = [
   },
 ];
 
-export function TheNavbar() {
+export function TheNavbar({ className }: ClassNameProp) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center shadow-lg px-4 py-4">
+    <nav className={cn('flex items-center shadow-lg px-4 py-4', className)}>
       <Link href="/">
         <h1 className="text-2xl font-bold">Pizza Admin</h1>
       </Link>
