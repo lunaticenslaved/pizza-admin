@@ -7,10 +7,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id       String @id @default(cuid())
-  login    String
-  password String
+model Pizza {
+  id   String     @id @default(cuid())
+  name String     @db.VarChar(255)
+  tags PizzaTag[]
 
-  @@unique([login])
+  @@unique([name])
+}
+
+model PizzaTag {
+  id    String  @id @default(cuid())
+  title String  @db.VarChar(255)
+  pizza Pizza[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([title])
 }
