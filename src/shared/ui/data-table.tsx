@@ -19,10 +19,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 interface DataTableProps<T> {
   columns: ColumnDef<T>[];
   data: T[];
-  searchKey: string;
+  searchKey?: string;
+  onRowClick?(row: T): void;
 }
 
-export function DataTable<T>({ searchKey, data, columns }: DataTableProps<T>) {
+export function DataTable<T>({ searchKey, data, columns, onRowClick }: DataTableProps<T>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -44,15 +45,18 @@ export function DataTable<T>({ searchKey, data, columns }: DataTableProps<T>) {
 
   return (
     <>
-      <div className="flex items-center justify-between py-4">
-        <Input
-          placeholder="Поиск"
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
-          onChange={event => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
-          className="max-w-sm"
-        />
-        <span className="text-sm opacity-75">Всего: {data.length}</span>
-      </div>
+      {!!searchKey && (
+        <div className="flex items-center justify-between py-4">
+          <Input
+            placeholder="Поиск"
+            value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
+            onChange={event => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
+            className="max-w-sm"
+          />
+          <span className="text-sm opacity-75">Всего: {data.length}</span>
+        </div>
+      )}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -73,7 +77,11 @@ export function DataTable<T>({ searchKey, data, columns }: DataTableProps<T>) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map(row => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="cursor-pointer"
+                  onClick={() => onRowClick?.(row.original)}>
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

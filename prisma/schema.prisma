@@ -7,17 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Pizza {
-  id    String      @id @default(cuid())
-  name  String      @db.VarChar(255)
-  tags  PizzaTag[]
-  sizes PizzaSize[]
+model File {
+  id    String @id @default(uuid())
+  link  String @unique @db.Text
+  name  String @unique @db.Text
+  pizza Pizza?
 
-  @@unique([name])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Pizza {
+  id      String       @id @default(uuid())
+  title   String       @unique @db.VarChar(255)
+  tags    PizzaTag[]
+  prices  PizzaPrice[]
+  imageId String       @unique
+  image   File         @relation(fields: [imageId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PizzaPrice {
+  id      String    @id @default(uuid())
+  rub     Decimal   @db.Money
+  pizzaId String
+  pizza   Pizza     @relation(fields: [pizzaId], references: [id], onDelete: Cascade)
+  sizeId  String
+  size    PizzaSize @relation(fields: [sizeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([pizzaId, sizeId])
 }
 
 model PizzaTag {
-  id    String  @id @default(cuid())
+  id    String  @id @default(uuid())
   title String  @db.VarChar(255)
   pizza Pizza[]
 
@@ -28,9 +55,9 @@ model PizzaTag {
 }
 
 model PizzaSize {
-  id    String  @id @default(cuid())
-  title String  @db.VarChar(255)
-  pizza Pizza[]
+  id     String       @id @default(uuid())
+  title  String       @db.VarChar(255)
+  prices PizzaPrice[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

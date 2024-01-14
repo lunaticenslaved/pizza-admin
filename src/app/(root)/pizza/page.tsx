@@ -1,10 +1,12 @@
 import { PlusIcon } from '@radix-ui/react-icons';
+import Link from 'next/link';
 
 import { PizzaSizeFormDialog, PizzaSizeTable } from '@/entities/pazza-size';
 import { PizzaTagFormDialog, PizzaTagsTable } from '@/entities/pizza-tag';
 import { db } from '@/shared/db';
 import { Button } from '@/shared/ui/button';
 
+import { PizzaTable } from './_components/common';
 import { Section } from './_components/section';
 
 export default async function PizzaPage() {
@@ -25,7 +27,30 @@ export default async function PizzaPage() {
     include: {
       _count: {
         select: {
-          pizza: true,
+          prices: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  const pizza = await db.pizza.findMany({
+    include: {
+      image: {
+        select: {
+          link: true,
+        },
+      },
+      prices: {
+        select: {
+          rub: true,
+          size: {
+            select: {
+              title: true,
+            },
+          },
         },
       },
     },
@@ -36,6 +61,18 @@ export default async function PizzaPage() {
 
   return (
     <>
+      <Section
+        title="Пицца"
+        append={
+          <Button asChild>
+            <Link href="/pizza/new">
+              <PlusIcon className="h-4 w-4 mr-2" />
+              Создать пиццу
+            </Link>
+          </Button>
+        }>
+        <PizzaTable pizza={pizza} />
+      </Section>
       <Section
         title="Теги"
         append={

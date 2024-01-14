@@ -11,10 +11,12 @@ const routes = [
   {
     title: 'Dashboard',
     href: '/',
+    isActive: (pathname: string) => pathname === '/',
   },
   {
     title: 'Пицца',
     href: '/pizza',
+    isActive: (pathname: string) => pathname.startsWith('/pizza'),
   },
 ];
 
@@ -27,12 +29,12 @@ export function TheNavbar({ className }: ClassNameProp) {
         <h1 className="text-2xl font-bold">Pizza Admin</h1>
       </Link>
       <div className="flex-1 px-6">
-        {routes.map(({ title, href }) => (
+        {routes.map(({ title, href, isActive }) => (
           <Link
             key={href}
             href={href}
             className={cn('px-2 opacity-50 hover:opacity-100 transition-all', {
-              'opacity-100': pathname === href,
+              'opacity-100': isActive(pathname),
             })}>
             {title}
           </Link>

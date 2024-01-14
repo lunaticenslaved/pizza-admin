@@ -7,7 +7,7 @@ import { DataTable } from '@/shared/ui/data-table';
 
 import { Actions } from './actions';
 
-type PizzaSizeWithCount = PizzaSize & { _count: { pizza: number } };
+type PizzaSizeWithCount = PizzaSize & { _count: { prices: number } };
 
 const columnHelper = createColumnHelper<PizzaSizeWithCount>();
 
@@ -19,7 +19,7 @@ const columns: ColumnDef<PizzaSizeWithCount>[] = [
   columnHelper.display({
     id: 'pizzaCount',
     header: 'Пиццы',
-    cell: props => props.row.original._count.pizza,
+    cell: props => props.row.original._count.prices,
   }),
   columnHelper.display({
     id: 'actions',
