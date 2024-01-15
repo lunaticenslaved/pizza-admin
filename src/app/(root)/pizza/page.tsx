@@ -1,8 +1,9 @@
 import { PlusIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 
-import { PizzaSizeFormDialog, PizzaSizeTable } from '@/entities/pazza-size';
+import { PizzaDoughTypeFormDialog, PizzaDoughTypeTable } from '@/entities/pizza-dough-type';
 import { normalizePizzaPrice } from '@/entities/pizza-price';
+import { PizzaSizeFormDialog, PizzaSizeTable } from '@/entities/pizza-size';
 import { PizzaTagFormDialog, PizzaTagsTable } from '@/entities/pizza-tag';
 import { db } from '@/shared/db';
 import { Button } from '@/shared/ui/button';
@@ -29,6 +30,19 @@ export default async function PizzaPage() {
       _count: {
         select: {
           prices: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  const doughTypes = await db.pizzaDoughType.findMany({
+    include: {
+      _count: {
+        select: {
+          pizza: true,
         },
       },
     },
@@ -108,6 +122,20 @@ export default async function PizzaPage() {
           />
         }>
         <PizzaSizeTable sizes={sizes} />
+      </Section>
+      <Section
+        title="Типы теста"
+        append={
+          <PizzaDoughTypeFormDialog
+            trigger={
+              <Button>
+                <PlusIcon className="h-4 w-4 mr-2" />
+                Создать тесто
+              </Button>
+            }
+          />
+        }>
+        <PizzaDoughTypeTable doughTypes={doughTypes} />
       </Section>
     </>
   );

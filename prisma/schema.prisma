@@ -18,12 +18,13 @@ model File {
 }
 
 model Pizza {
-  id      String       @id @default(uuid())
-  title   String       @unique @db.VarChar(255)
-  tags    PizzaTag[]
-  prices  PizzaPrice[]
-  imageId String       @unique
-  image   File         @relation(fields: [imageId], references: [id], onDelete: Cascade)
+  id         String           @id @default(uuid())
+  title      String           @unique @db.VarChar(255)
+  doughTypes PizzaDoughType[]
+  tags       PizzaTag[]
+  prices     PizzaPrice[]
+  imageId    String           @unique
+  image      File             @relation(fields: [imageId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,6 +59,17 @@ model PizzaSize {
   id     String       @id @default(uuid())
   title  String       @db.VarChar(255)
   prices PizzaPrice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([title])
+}
+
+model PizzaDoughType {
+  id    String  @id @default(uuid())
+  title String  @db.VarChar(255)
+  pizza Pizza[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

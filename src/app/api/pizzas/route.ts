@@ -22,6 +22,12 @@ export async function GET() {
             },
           },
         },
+        doughTypes: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

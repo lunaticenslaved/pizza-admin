@@ -4,6 +4,7 @@ export const PizzaSchema = z.object({
   imageLink: z.string().min(1, 'Укажите превью'),
   title: z.string().min(1, 'Укажите название'),
   tags: z.array(z.object({ id: z.string(), title: z.string() })),
+  doughTypes: z.array(z.object({ id: z.string(), title: z.string() })),
   prices: z
     .array(
       z.object({

@@ -50,6 +50,9 @@ export async function createPizza(values: PizzaValues): Promise<ServerResponse> 
         tags: {
           connect: data.tags.map(tag => ({ id: tag.id })),
         },
+        doughTypes: {
+          connect: data.doughTypes.map(dt => ({ id: dt.id })),
+        },
         prices: {
           create: data.prices.map(price => ({
             sizeId: price.sizeId,
@@ -134,6 +137,9 @@ export async function updatePizza(pizzaId: string, values: PizzaValues): Promise
         imageId: image.id,
         tags: {
           set: data.tags.map(tag => ({ id: tag.id })),
+        },
+        doughTypes: {
+          set: data.doughTypes.map(dt => ({ id: dt.id })),
         },
         prices: {
           create: data.prices.map(price => ({
