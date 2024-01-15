@@ -36,28 +36,38 @@ export default async function PizzaPage() {
     },
   });
 
-  const pizza = await db.pizza.findMany({
-    include: {
-      image: {
-        select: {
-          link: true,
+  const pizza = await db.pizza
+    .findMany({
+      include: {
+        image: {
+          select: {
+            link: true,
+          },
         },
-      },
-      prices: {
-        select: {
-          rub: true,
-          size: {
-            select: {
-              title: true,
+        prices: {
+          select: {
+            rub: true,
+            size: {
+              select: {
+                title: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    .then(arr =>
+      arr.map(item => ({
+        ...item,
+        prices: item.prices.map(price => ({
+          ...price,
+          rub: price.rub.toNumber(),
+        })),
+      })),
+    );
 
   return (
     <>

@@ -1,7 +1,6 @@
 'use client';
 
 import { Pizza } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table';
 import { minBy } from 'lodash';
 
@@ -14,7 +13,7 @@ type LocalPizza = Pizza & {
     link: string;
   };
   prices: Array<{
-    rub: Decimal;
+    rub: number;
     size: {
       title: string;
     };
