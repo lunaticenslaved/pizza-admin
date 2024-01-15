@@ -5,5 +5,5 @@ export function isAuthRoute(route: string) {
 }
 
 export function isApiRoute(route: string) {
-  return ['/api/auth'].includes(route);
+  return route.startsWith('/api/');
 }

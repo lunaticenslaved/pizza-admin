@@ -1,4 +1,5 @@
 import NextAuth from 'next-auth';
+import { NextResponse } from 'next/server';
 
 import { authConfig } from '../auth.config';
 
@@ -14,11 +15,11 @@ export default auth(req => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
-  const isApiAuthRoute = isApiRouteFn(nextUrl.pathname);
+  const isApiRoute = isApiRouteFn(nextUrl.pathname);
   const isAuthRoute = isAuthRouteFn(nextUrl.pathname);
 
-  if (isApiAuthRoute) {
-    return null;
+  if (isApiRoute) {
+    return NextResponse.next();
   }
 
   if (isAuthRoute) {
@@ -26,16 +27,16 @@ export default auth(req => {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
 
-    return null;
+    return NextResponse.next();
   }
 
   if (!isLoggedIn) {
     return Response.redirect(new URL('/auth/login', nextUrl));
   }
 
-  return null;
+  return NextResponse.next();
 });
 
 export const config = {
-  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/api/(.*)', '/(api|trpc)(.*)'],
 };

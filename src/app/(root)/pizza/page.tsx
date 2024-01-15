@@ -2,6 +2,7 @@ import { PlusIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 
 import { PizzaSizeFormDialog, PizzaSizeTable } from '@/entities/pazza-size';
+import { normalizePizzaPrice } from '@/entities/pizza-price';
 import { PizzaTagFormDialog, PizzaTagsTable } from '@/entities/pizza-tag';
 import { db } from '@/shared/db';
 import { Button } from '@/shared/ui/button';
@@ -62,10 +63,7 @@ export default async function PizzaPage() {
     .then(arr =>
       arr.map(item => ({
         ...item,
-        prices: item.prices.map(price => ({
-          ...price,
-          rub: price.rub.toNumber(),
-        })),
+        prices: item.prices.map(normalizePizzaPrice),
       })),
     );
 
