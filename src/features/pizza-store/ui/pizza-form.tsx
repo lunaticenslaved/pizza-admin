@@ -25,7 +25,7 @@ type LocalPizza = Pizza & {
   image: { link: string };
   tags: Pick<PizzaTag, 'id' | 'title'>[];
   doughTypes: Pick<PizzaTag, 'id' | 'title'>[];
-  prices: Array<Pick<PizzaPrice, 'id' | 'sizeId' | 'rub'>>;
+  prices: Array<Pick<PizzaPrice, 'id' | 'sizeId'> & { rub: number }>;
 };
 
 export interface PizzaFormProps {

@@ -1,3 +1,4 @@
+import { normalizePizzaPrice } from '@/entities/pizza-price';
 import { db } from '@/shared/db';
 
 import { PizzaForm } from '../_components/common';
@@ -17,17 +18,22 @@ export default async function PizzaPage({ params: { pizzaId } }: PizzaPageProps)
     return <PizzaForm tags={tags} sizes={sizes} doughTypes={doughTypes} />;
   }
 
-  const pizza = await db.pizza.findUnique({
-    where: {
-      id: pizzaId,
-    },
-    include: {
-      tags: true,
-      prices: true,
-      image: true,
-      doughTypes: true,
-    },
-  });
+  const pizza = await db.pizza
+    .findUniqueOrThrow({
+      where: {
+        id: pizzaId,
+      },
+      include: {
+        tags: true,
+        prices: true,
+        image: true,
+        doughTypes: true,
+      },
+    })
+    .then(data => ({
+      ...data,
+      prices: data?.prices.map(normalizePizzaPrice),
+    }));
 
   return <PizzaForm tags={tags} sizes={sizes} pizza={pizza} doughTypes={doughTypes} />;
 }
