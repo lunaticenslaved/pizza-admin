@@ -28,6 +28,12 @@ export async function GET() {
             title: true,
           },
         },
+        tags: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
