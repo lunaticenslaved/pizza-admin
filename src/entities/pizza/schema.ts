@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-export const PizzaSchema = z.object({
-  imageLink: z.string().min(1, 'Укажите превью'),
+const common = {
   title: z.string().min(1, 'Укажите название'),
   tags: z.array(z.object({ id: z.string(), title: z.string() })),
   doughTypes: z.array(z.object({ id: z.string(), title: z.string() })),
@@ -15,4 +14,21 @@ export const PizzaSchema = z.object({
       }),
     )
     .min(1, 'Создайте хотя бы одну цену'),
+};
+
+export const PizzaSchema = z
+  .object({
+    ...common,
+    image: z.string().min(1, 'Укажите превью'),
+  })
+  .or(
+    z.object({
+      ...common,
+      image: z.instanceof(File).refine(v => !!v, 'Укажите превью'),
+    }),
+  );
+
+export const PizzaSubmitSchema = z.object({
+  ...common,
+  imageLink: z.string().min(1, 'Укажите превью'),
 });

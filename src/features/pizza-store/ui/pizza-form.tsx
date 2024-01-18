@@ -7,15 +7,17 @@ import { toast } from 'react-toastify';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pizza, PizzaDoughType, PizzaPrice, PizzaSize, PizzaTag } from '@prisma/client';
 import { Cross1Icon } from '@radix-ui/react-icons';
+import { omit } from 'lodash';
 
 import { ImageDrop } from '@/entities/file';
+import { useUploadFile } from '@/entities/file/hooks';
 import { createPizza } from '@/entities/pizza';
 import { PizzaDoughTypeSelect } from '@/entities/pizza-dough-type';
 import { PizzaPriceTable, PriceFormDialog } from '@/entities/pizza-price';
 import { PizzaTagSelect } from '@/entities/pizza-tag';
 import { PizzaSchema } from '@/entities/pizza/schema';
 import { updatePizza } from '@/entities/pizza/server-actions';
-import { PizzaValues } from '@/entities/pizza/types';
+import { PizzaSubmitValues, PizzaValues } from '@/entities/pizza/types';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/shared/ui/form';
@@ -40,7 +42,7 @@ export function PizzaForm({ doughTypes, tags, sizes, pizza, onSubmitted }: Pizza
   const form = useForm<PizzaValues>({
     resolver: zodResolver(PizzaSchema),
     defaultValues: {
-      imageLink: pizza?.image.link || '',
+      image: pizza?.image.link || '',
       title: pizza?.title || '',
       tags: pizza?.tags || [],
       doughTypes: pizza?.doughTypes || [],
@@ -75,10 +77,30 @@ export function PizzaForm({ doughTypes, tags, sizes, pizza, onSubmitted }: Pizza
   const { handleSubmit } = form;
 
   const [isPending, startTransition] = useTransition();
+  const { uploadFile } = useUploadFile();
 
   function onSubmit(values: PizzaValues) {
-    startTransition(() => {
-      const promise = pizza ? updatePizza(pizza.id, values) : createPizza(values);
+    startTransition(async () => {
+      let imageLink = '';
+      let submitValues: PizzaSubmitValues;
+
+      if (values.image instanceof File) {
+        await uploadFile(values.image, {
+          onSuccess: ({ link }) => (imageLink = link),
+        });
+
+        submitValues = {
+          ...omit(values, 'image'),
+          imageLink,
+        };
+      } else {
+        submitValues = {
+          ...values,
+          imageLink: values.image,
+        };
+      }
+
+      const promise = pizza ? updatePizza(pizza.id, submitValues) : createPizza(submitValues);
 
       promise
         .then(({ type, message }) => {
@@ -112,15 +134,16 @@ export function PizzaForm({ doughTypes, tags, sizes, pizza, onSubmitted }: Pizza
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="imageLink"
+          name="image"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Превью</FormLabel>
               <FormControl>
                 <ImageDrop
-                  value={{ link: field.value }}
+                  link={typeof field.value === 'string' ? field.value : undefined}
                   disabled={isPending}
-                  onChange={value => field.onChange(value)}
+                  onDelete={() => field.onChange('')}
+                  onSelect={value => field.onChange(value)}
                 />
               </FormControl>
               <FormMessage />

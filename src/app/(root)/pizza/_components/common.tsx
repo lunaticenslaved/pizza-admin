@@ -11,8 +11,17 @@ export function PizzaTable(props: PizzaTableProps) {
   return <PizzaTableBase {...props} onRowClick={pizza => router.push(`/pizza/${pizza.id}`)} />;
 }
 
-export function PizzaForm(props: PizzaFormProps) {
+export function PizzaForm({ onSubmitted, ...props }: PizzaFormProps) {
   const router = useRouter();
 
-  return <PizzaFormBase {...props} onSubmitted={() => router.refresh()} />;
+  return (
+    <PizzaFormBase
+      {...props}
+      onSubmitted={() => {
+        router.refresh();
+        router.replace('/pizza');
+        onSubmitted?.();
+      }}
+    />
+  );
 }

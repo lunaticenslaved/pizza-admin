@@ -1,14 +1,15 @@
 'use server';
 
+import { deleteFile } from '@/entities/file/server-action';
 import { db } from '@/shared/db';
 import { ServerResponse } from '@/shared/types';
 
-import { PizzaSchema } from './schema';
-import { PizzaValues } from './types';
+import { PizzaSubmitSchema } from './schema';
+import { PizzaSubmitValues } from './types';
 
-export async function createPizza(values: PizzaValues): Promise<ServerResponse> {
+export async function createPizza(values: PizzaSubmitValues): Promise<ServerResponse> {
   return db.$transaction(async (trx): Promise<ServerResponse> => {
-    const validatedData = PizzaSchema.safeParse(values);
+    const validatedData = PizzaSubmitSchema.safeParse(values);
 
     if (!validatedData.success) {
       return {
@@ -69,9 +70,12 @@ export async function createPizza(values: PizzaValues): Promise<ServerResponse> 
   });
 }
 
-export async function updatePizza(pizzaId: string, values: PizzaValues): Promise<ServerResponse> {
+export async function updatePizza(
+  pizzaId: string,
+  values: PizzaSubmitValues,
+): Promise<ServerResponse> {
   return db.$transaction(async (trx): Promise<ServerResponse> => {
-    const validatedData = PizzaSchema.safeParse(values);
+    const validatedData = PizzaSubmitSchema.safeParse(values);
 
     if (!validatedData.success) {
       return {
@@ -120,6 +124,22 @@ export async function updatePizza(pizzaId: string, values: PizzaValues): Promise
         type: 'error',
         message: 'Изображение не найдено',
       };
+    }
+
+    if (existingPizza.imageId !== image.id) {
+      await db.file.delete({
+        where: {
+          id: existingPizza.imageId,
+        },
+      });
+
+      const currentFile = await db.file.findUniqueOrThrow({
+        where: {
+          id: existingPizza.imageId,
+        },
+      });
+
+      await deleteFile({ link: currentFile.link });
     }
 
     await trx.pizzaPrice.deleteMany({
